@@ -81,12 +81,12 @@
 
   // Set raw text font.
   // Default is Fira Mono at 8.8pt
-  show raw: set text(font: ("Iosevka", "Fira Mono"), size: 9pt)
+  show raw: set text(font: ("Fira Mono"), size: 9pt)
 
   // Configure page size and margins.
   set page(
     paper: paper-size,
-    margin: (bottom: 1.75cm, top: 2.25cm),
+    margin: 1in
   )
 
   // Cover page.
@@ -125,8 +125,22 @@
 
   // Add vertical space after headings.
   show heading: it => {
-    it
-    v(2%, weak: true)
+    if it.depth == 1 {
+      [
+        #set par(spacing: 1em)
+        #if it.numbering != none {
+          let chapter_num = counter(heading).display(it.numbering)
+          text(1.8em)[Chapter #chapter_num]
+        }
+
+        #text(1.2em)[#it.body]
+
+        #v(2em)
+      ]
+    } else {
+      it
+      v(2%, weak: true)
+    }
   }
   // Do not hyphenate headings.
   show heading: set text(hyphenate: false)
@@ -154,40 +168,51 @@
   }
 
   // Configure page numbering and footer.
+  // set page(
+  //   footer: context {
+  //     // Get current page number.
+  //     let i = counter(page).at(here()).first()
+
+  //     // Align right for even pages and left for odd.
+  //     let is-odd = calc.odd(i)
+  //     let aln = if is-odd {
+  //       right
+  //     } else {
+  //       left
+  //     }
+
+  //     // Are we on a page that starts a chapter?
+  //     let target = heading.where(level: 1)
+  //     if query(target).any(it => it.location().page() == i) {
+  //       return align(aln)[#i]
+  //     }
+
+  //     // Find the chapter of the section we are currently in.
+  //     let before = query(target.before(here()))
+  //     if before.len() > 0 {
+  //       let current = before.last()
+  //       let gap = 1.75em
+  //       let chapter = upper(text(size: 0.68em, current.body))
+  //       if current.numbering != none {
+  //         if is-odd {
+  //           align(aln)[#chapter #h(gap) #i]
+  //         } else {
+  //           align(aln)[#i #h(gap) #chapter]
+  //         }
+  //       }
+  //     }
+  //   },
+  // )
+
   set page(
     footer: context {
-      // Get current page number.
-      let i = counter(page).at(here()).first()
-
-      // Align right for even pages and left for odd.
-      let is-odd = calc.odd(i)
-      let aln = if is-odd {
-        right
-      } else {
-        left
-      }
-
-      // Are we on a page that starts a chapter?
-      let target = heading.where(level: 1)
-      if query(target).any(it => it.location().page() == i) {
-        return align(aln)[#i]
-      }
-
-      // Find the chapter of the section we are currently in.
-      let before = query(target.before(here()))
-      if before.len() > 0 {
-        let current = before.last()
-        let gap = 1.75em
-        let chapter = upper(text(size: 0.68em, current.body))
-        if current.numbering != none {
-          if is-odd {
-            align(aln)[#chapter #h(gap) #i]
-          } else {
-            align(aln)[#i #h(gap) #chapter]
-          }
-        }
-      }
-    },
+      let page_num = counter(page).at(here()).first()
+      let chapter_num = counter(heading).get().first()
+      let chapter_name = query(heading.where(level: 1).before(here())).last().body
+      let chapter_txt = upper(text(size: 0.83em, [#chapter_num #h(0.5em) #chapter_name]))
+      let page_txt = text(size: 0.83em, numbering(page.numbering, page_num))
+      align(center)[#chapter_txt #h(1fr) #page_txt]
+    }
   )
 
   // Configure equation numbering.
@@ -259,6 +284,7 @@
     show std-bibliography: set text(0.85em)
     // Use default paragraph properties for bibliography.
     show std-bibliography: set par(leading: 0.65em, justify: false, linebreaks: auto)
+    show std-bibliography: set page(numbering: "1")
     bibliography
   }
 
