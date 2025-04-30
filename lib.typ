@@ -130,12 +130,16 @@
         #set par(spacing: 1em)
         #if it.numbering != none {
           let chapter_num = counter(heading).display(it.numbering)
-          text(1.8em)[Chapter #chapter_num]
+          [
+            #text(1.8em)[Chapter #chapter_num]
+
+            #text(1.2em)[#it.body]
+          ]
+        } else {
+          [
+            #text(1.8em)[#it.body]
+          ]
         }
-
-        #text(1.2em)[#it.body]
-
-        #v(2em)
       ]
     } else {
       it
@@ -209,7 +213,11 @@
       let page_num = counter(page).at(here()).first()
       let chapter_num = counter(heading).get().first()
       let chapter_name = query(heading.where(level: 1).before(here())).last().body
-      let chapter_txt = upper(text(size: 0.83em, [#chapter_num #h(0.5em) #chapter_name]))
+      let chapter_txt = if chapter_num == 0 {
+        upper(text(size: 0.83em, [#chapter_name]))
+      } else {
+        upper(text(size: 0.83em, [#chapter_num #h(0.5em) #chapter_name]))
+      }
       let page_txt = text(size: 0.83em, numbering(page.numbering, page_num))
       align(center)[#chapter_txt #h(1fr) #page_txt]
     }
