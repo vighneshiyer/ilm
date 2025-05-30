@@ -344,3 +344,14 @@
     body,
   )
 }
+
+#let callout(body) = {
+  block(
+    width: 100%,
+    fill: blue.lighten(95%),
+    inset: 2em,
+    radius: 0pt,
+    stroke: 1pt + blue.lighten(70%),
+    body,
+  )
+}
