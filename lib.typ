@@ -124,28 +124,40 @@
   set par(leading: 0.7em, spacing: 1.35em, justify: true, linebreaks: "optimized")
 
   // Add vertical space after headings.
-  show heading: it => {
-    if it.depth == 1 {
-      [
-        #set par(spacing: 1em)
-        #if it.numbering != none {
-          let chapter_num = counter(heading).display(it.numbering)
-          [
-            #text(1.8em)[Chapter #chapter_num]
+  show heading.where(level: 1): it => {
+    [
+      #set par(spacing: 1em)
+      #if it.numbering != none {
+        let chapter_num = counter(heading).display(it.numbering)
+        [
+          #text(1.8em)[Chapter #chapter_num]
 
-            #text(1.2em)[#it.body]
-          ]
-        } else {
-          [
-            #text(1.8em)[#it.body]
-          ]
-        }
-      ]
-    } else {
-      it
-      v(2%, weak: true)
-    }
+          #text(1.2em)[#it.body]
+        ]
+      } else {
+        [
+          #text(1.8em)[#it.body]
+        ]
+      }
+    ]
   }
+
+  show heading.where(level: 2): it => {
+    it
+    v(2%, weak: true)
+  }
+
+  show heading.where(level: 3): it => {
+    it
+    v(2%, weak: true)
+  }
+
+  show heading.where(level: 4): it => {
+    h(1.5em)
+    text(size: 1em, weight: 600, style: "italic", it.body + [.])
+    h(0.5em)
+  }
+
   // Do not hyphenate headings.
   show heading: set text(hyphenate: false)
 
